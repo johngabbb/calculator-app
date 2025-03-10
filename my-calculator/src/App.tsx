@@ -34,17 +34,20 @@ function App() {
     }
   };
 
-  const handleNumberInput = (digit: string) => {
-    setDisplayValue(
-      displayValue === "0" && digit !== "." ? digit : displayValue.concat(digit)
-    );
-    setWaitingForSecondOperand(false);
-  };
-
   const handleAllClear = (key: string) => {
     if (key === "AC") {
       setDisplayValue("0");
     }
+  };
+
+  const handleNumberInput = (digit: string) => {
+    setDisplayValue(
+      displayValue === "0"
+        ? digit
+        : displayValue.includes(".") && digit === "."
+        ? displayValue
+        : displayValue.concat(digit)
+    );
   };
 
   const handleOperation = (key: string) => {
@@ -55,9 +58,12 @@ function App() {
     } else {
       setDisplayValue(displayValue + key);
     }
+
+    if (["+", "-"].includes(key)) {
+    }
     // const numericValue = parseFloat(displayValue);
     // setFirstOperand(numericValue);
-    // setWaitingForSecondOperand(true);
+    setWaitingForSecondOperand(true);
   };
 
   const handleNegateOperation = () => {
