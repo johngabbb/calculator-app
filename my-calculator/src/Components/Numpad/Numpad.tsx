@@ -8,32 +8,40 @@ interface Props {
 
 const Numpad = ({ onClickKey }: Props) => {
   const keys = [
-    ["7", "8", "9", "AC", "/"],
-    ["4", "5", "6", "±", "x"],
-    ["1", "2", "3", "%", "-"],
-    ["Mode", "0", ".", "=", "+"],
+    ["7", "8", "9", "DEL", "AC"],
+    ["4", "5", "6", "+", "x"],
+    ["1", "2", "3", "-", "/"],
+    [".", "0", "±", "%", "="],
   ];
 
   const getButtonClass = (key: string) => {
-    if (
-      ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "Mode"].includes(
-        key
-      )
-    ) {
-      return "bg-neutral-600";
-    } else if (["±", "%", "AC"].includes(key)) {
-      return "bg-neutral-500";
-    } else if (["+", "-", "x", "/", "="].includes(key)) {
-      return "bg-amber-500 hover:bg-amber-400";
+    if (key === "=") {
+      return "bg-cyan-600 hover:bg-cyan-500 border-0 shadow-none";
+    } else {
+      return "bg-neutral-800 hover:bg-cyan-900 shadow-none group";
     }
-    return "bg-amber-500";
+  };
+
+  const getTextClass = (key: string) => {
+    if (
+      !["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "="].includes(key)
+    ) {
+      return "text-neutral-600 group-hover:text-white transition-colors";
+    } else if (key === "=") {
+      return "text-black text-lg";
+    } else {
+      return "text-neutral-200 group-hover:text-white transition-colors";
+    }
   };
 
   return (
     <>
-      <div className="bg-black w-full rounded-b-lg p-4">
+      <div className="bg-neutral-800 w-full rounded-b-lg p-4">
         {keys.map((row, rowIndex) => (
-          <div key={`row-${rowIndex}`} className="grid grid-cols-5 gap-2 mb-2">
+          <div
+            key={`row-${rowIndex}`}
+            className="grid grid-cols-5 gap-2 mb-2 bg-"
+          >
             {row.map((key) => (
               <Button
                 key={key}
@@ -41,7 +49,7 @@ const Numpad = ({ onClickKey }: Props) => {
                 onClick={onClickKey}
                 className={`${getButtonClass(key)} py-4`}
               >
-                {key}
+                <span className={getTextClass(key)}>{key}</span>
               </Button>
             ))}
           </div>
