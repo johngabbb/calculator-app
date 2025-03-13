@@ -8,10 +8,10 @@ interface Props {
 
 const Numpad = ({ onClickKey }: Props) => {
   const keys = [
-    ["7", "8", "9", "DEL", "AC"],
-    ["4", "5", "6", "+", "x"],
-    ["1", "2", "3", "-", "/"],
-    [".", "0", "±", "%", "="],
+    ["7", "8", "9", "+", "AC"],
+    ["4", "5", "6", "-", "DEL"],
+    ["1", "2", "3", "x", "/"],
+    ["mod", "0", ".", "±", "="],
   ];
 
   const getButtonClass = (key: string) => {

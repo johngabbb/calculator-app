@@ -11,10 +11,11 @@ function App() {
   const [firstOperand, setFirstOperand] = useState<number | null>(null);
   const [equalOperation, setEqualOperation] = useState<boolean>(false);
   const [operator, setOperator] = useState<string | null>(null);
+  const [prevOperator, setPrevOperator] = useState<string | null>(null);
   const [waitingForSecondOperand, setWaitingForSecondOperand] =
     useState<boolean>(false);
 
-  const operations = ["+", "-", "x", "/", "%", "="];
+  const operations = ["+", "-", "x", "/", "mod", "="];
 
   const onClickKey = (e: React.MouseEvent<HTMLButtonElement>) => {
     const value = e.currentTarget.value;
@@ -66,43 +67,69 @@ function App() {
     setWaitingForSecondOperand(false);
   };
 
-  // &&
-  // !waitingForSecondOperand
-
   const handleOperation = (key: string) => {
-    if (operator !== null && firstOperand !== null) {
+    if (
+      operator !== null &&
+      firstOperand !== null &&
+      !waitingForSecondOperand
+    ) {
       let result = firstOperand;
+      const secondOperand = parseFloat(displayValue);
+
       switch (operator) {
         case "+":
-          result = result + parseFloat(displayValue);
+          result = result + secondOperand;
           break;
         case "-":
-          result = result - parseFloat(displayValue);
+          result = result - secondOperand;
           break;
         case "x":
-          result = result * parseFloat(displayValue);
+          result = result * secondOperand;
           break;
         case "/":
-          result = result / parseFloat(displayValue);
+          result = result / secondOperand;
           break;
-        case "%":
-          result = result % parseFloat(displayValue);
+        case "mod":
+          result = result % secondOperand;
+          break;
+        case "=":
+          if (equalOperation) {
+            switch (prevOperator) {
+              case "+":
+                result = result + secondOperand;
+                break;
+              case "-":
+                result = result - secondOperand;
+                break;
+              case "x":
+                result = result * secondOperand;
+                break;
+              case "/":
+                result = result / secondOperand;
+                break;
+              case "mod":
+                result = result % secondOperand;
+                break;
+            }
+          }
           break;
       }
 
       if (key === "=") {
-        setEqualOperation(true);
         setOperator(operator);
+        setPrevOperator(operator);
         if (!equalOperation) {
           setFirstOperand(parseFloat(displayValue));
           setDisplayFullOperation(
-            `${firstOperand} ${operator} ${displayValue}`
+            `${firstOperand} ${operator} ${displayValue} ${key}`
           );
         } else {
           setDisplayFullOperation(
-            `${displayValue} ${operator} ${firstOperand}`
+            `${displayValue} ${operator} ${firstOperand} ${key}`
           );
         }
+
+        setEqualOperation(true);
         setWaitingForSecondOperand(false);
         setDisplayValue(result.toString());
       } else {
@@ -123,20 +150,7 @@ function App() {
   };
 
   // Should negate second operand value
-  const handleNegateOperation = () => {
-    if (
-      operations.includes(displayValue) &&
-      operations.includes(displayFullOperation)
-    )
-      return;
-
-    const numericValue = parseFloat(displayValue);
-    const displayFullOperationValue = parseFloat(displayFullOperation);
-    const negateValue = numericValue * -1;
-    const negateDisplay = displayFullOperationValue * -1;
-    setDisplayValue(negateValue.toString());
-    setDisplayFullOperation(negateDisplay.toString());
-  };
+  const handleNegateOperation = () => {};
 
   const handleModeChange = (mode: "basic" | "advance") => {
     setActiveMode(mode);
