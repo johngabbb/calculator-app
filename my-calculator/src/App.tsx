@@ -2,20 +2,21 @@ import { useState } from "react";
 import "./App.css";
 import Numpad from "./Components/Numpad/Numpad";
 import DisplayOutput from "./Components/DisplayOutput/DisplayOutput";
-
-interface Props {}
+import ModeButtons from "./Components/ModeButtons/ModeButtons";
 
 function App() {
+  const [activeMode, setActiveMode] = useState<"basic" | "advance">("basic");
   const [displayValue, setDisplayValue] = useState<string>("0");
   const [displayFullOperation, setDisplayFullOperation] = useState<string>("");
   const [firstOperand, setFirstOperand] = useState<number | null>(null);
+  const [equalOperation, setEqualOperation] = useState<boolean>(false);
   const [operator, setOperator] = useState<string | null>(null);
   const [waitingForSecondOperand, setWaitingForSecondOperand] =
     useState<boolean>(false);
 
-  const operations = ["+", "-", "x", "/", "%"];
+  const operations = ["+", "-", "x", "/", "%", "="];
 
-  const onCLickKey = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const onClickKey = (e: React.MouseEvent<HTMLButtonElement>) => {
     const value = e.currentTarget.value;
 
     if (/[0-9.]/.test(value)) {
@@ -39,100 +40,85 @@ function App() {
     if (key === "AC") {
       setDisplayValue("0");
       setDisplayFullOperation("");
-      setOperator("");
+      setOperator(null);
       setFirstOperand(null);
       setWaitingForSecondOperand(false);
     }
   };
 
   const handleNumberInput = (digit: string) => {
-    if (waitingForSecondOperand) {
+    if (waitingForSecondOperand || equalOperation) {
       setDisplayValue(digit);
-      setWaitingForSecondOperand(false);
+      setEqualOperation(false);
+      setDisplayFullOperation(equalOperation ? "" : displayFullOperation);
     } else {
-      setDisplayValue(
-        displayValue === "0"
-          ? digit
-          : displayValue.includes(".") && digit === "."
-          ? displayValue
-          : displayValue.concat(digit)
+      if (displayValue === "0" && digit !== ".") {
+        setDisplayValue(digit);
+      } else if (digit === "." && displayValue.includes(".")) {
+        setDisplayValue(displayValue);
+      } else {
+        setDisplayValue(displayValue.concat(digit));
+      }
+      setDisplayFullOperation(
+        displayFullOperation === "" ? "" : displayFullOperation
       );
     }
-    setDisplayFullOperation(
-      displayFullOperation === ""
-        ? digit
-        : displayFullOperation.includes(".") && digit === "."
-        ? displayFullOperation
-        : displayFullOperation.concat(digit)
-    );
+    setWaitingForSecondOperand(false);
   };
 
+  // &&
+  // !waitingForSecondOperand
+
   const handleOperation = (key: string) => {
-    if (displayValue === "0" && displayFullOperation === "") return;
-
     if (operator !== null && firstOperand !== null) {
-      let result = 0;
-
-      switch (key) {
+      let result = firstOperand;
+      switch (operator) {
         case "+":
+          result = result + parseFloat(displayValue);
+          break;
         case "-":
-          switch (operator) {
-            case "+":
-              result = firstOperand + parseFloat(displayValue);
-              setFirstOperand(result);
-              setOperator(key);
-              setWaitingForSecondOperand(true);
-              setDisplayValue(result.toString());
-              break;
-            case "-":
-              result = firstOperand - parseFloat(displayValue);
-              setFirstOperand(result);
-              setOperator(key);
-              setWaitingForSecondOperand(true);
-              setDisplayValue(result.toString());
-              break;
-          }
+          result = result - parseFloat(displayValue);
           break;
-
-        case "*":
+        case "x":
+          result = result * parseFloat(displayValue);
+          break;
         case "/":
-          switch (operator) {
-            case "*":
-              result = firstOperand * parseFloat(displayValue);
-              setFirstOperand(result);
-              setOperator(key);
-              setWaitingForSecondOperand(true);
-              setDisplayValue(result.toString());
-              break;
-            case "/":
-              result = firstOperand / parseFloat(displayValue);
-              setFirstOperand(result);
-              setOperator(key);
-              setWaitingForSecondOperand(true);
-              setDisplayValue(result.toString());
-              break;
-            default:
-              setFirstOperand(parseFloat(displayValue));
-              setOperator(key);
-              setDisplayValue(displayValue);
-          }
+          result = result / parseFloat(displayValue);
           break;
-        default:
-          result = 0;
+        case "%":
+          result = result % parseFloat(displayValue);
+          break;
       }
-    }
 
-    if (!(operator !== null && firstOperand !== null)) {
-      setDisplayValue(displayValue);
-      setOperator(key);
-      setWaitingForSecondOperand(true);
-      setFirstOperand(parseFloat(displayValue));
-    }
-
-    if (operations.includes(displayFullOperation.slice(-1))) {
-      setDisplayFullOperation(displayFullOperation.slice(0, -1) + key);
+      if (key === "=") {
+        setEqualOperation(true);
+        setOperator(operator);
+        if (!equalOperation) {
+          setFirstOperand(parseFloat(displayValue));
+          setDisplayFullOperation(
+            `${firstOperand} ${operator} ${displayValue}`
+          );
+        } else {
+          setDisplayFullOperation(
+            `${displayValue} ${operator} ${firstOperand}`
+          );
+        }
+        setWaitingForSecondOperand(false);
+        setDisplayValue(result.toString());
+      } else {
+        setOperator(key);
+        setDisplayValue(result.toString());
+        setFirstOperand(result);
+        setWaitingForSecondOperand(true);
+        setDisplayFullOperation(` ${result} ${key}`);
+      }
     } else {
-      setDisplayFullOperation(displayFullOperation + key);
+      setOperator(key);
+      setFirstOperand(parseFloat(displayValue));
+      setWaitingForSecondOperand(true);
+      setDisplayFullOperation(
+        parseFloat(displayValue).toString().concat(` ${key}`)
+      );
     }
   };
 
@@ -152,15 +138,25 @@ function App() {
     setDisplayFullOperation(negateDisplay.toString());
   };
 
+  const handleModeChange = (mode: "basic" | "advance") => {
+    setActiveMode(mode);
+  };
+
   return (
-    <div className="bg-black h-screen w-screen flex items-center justify-center">
-      <main className="w-100 flex-none">
+    // <div className="flex flex-col items-center justify-center overflow-auto min-h-screen w-full">
+    <div className="flex flex-col items-center justify-center overflow-auto min-h-screen w-full bg-neutral-900 bg-image  bg-[size:15px_15px] [background-image:linear-gradient(to_right,rgba(100,100,100,0.2)_1px,transparent_1px),linear-gradient(to_bottom,rgba(100,100,100,0.2)_1px,transparent_1px)]">
+      <ModeButtons
+        activeMode={activeMode}
+        handleModeChange={handleModeChange}
+      />
+
+      <div className="w-100 rounded-lg border-3 border-solid border-neutral-700 mb-10">
         <DisplayOutput
           displayValue={displayValue}
           displayFullOperation={displayFullOperation}
         />
-        <Numpad onClickKey={onCLickKey} />
-      </main>
+        <Numpad onClickKey={onClickKey} />
+      </div>
     </div>
   );
 }
