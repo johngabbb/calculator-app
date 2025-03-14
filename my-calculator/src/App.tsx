@@ -1,8 +1,10 @@
 import { useState } from "react";
 import "./App.css";
-import Numpad from "./Components/Numpad/Numpad";
-import DisplayOutput from "./Components/DisplayOutput/DisplayOutput";
 import ModeButtons from "./Components/ModeButtons/ModeButtons";
+import DisplayOutputBasic from "./Components/CalculatorModes/Basic/DisplayOutput/DisplayOutputBasic";
+import NumpadBasic from "./Components/CalculatorModes/Basic/Numpad/NumpadBasic";
+import DisplayOutputAdvance from "./Components/CalculatorModes/Advance/DisplayOutput/DisplayOutputAdvance";
+import NumpadAdvance from "./Components/CalculatorModes/Advance/Numpad/NumpadAdvance";
 
 function App() {
   const [activeMode, setActiveMode] = useState<"basic" | "advance">("basic");
@@ -172,14 +174,20 @@ function App() {
   };
 
   return (
-    // <div className="flex flex-col items-center justify-center overflow-auto min-h-screen w-full">
     <div className="flex flex-col items-center justify-center overflow-auto min-h-screen w-full bg-neutral-900 bg-image  bg-[size:15px_15px] [background-image:linear-gradient(to_right,rgba(100,100,100,0.2)_1px,transparent_1px),linear-gradient(to_bottom,rgba(100,100,100,0.2)_1px,transparent_1px)]">
       <ModeButtons activeMode={activeMode} handleModeChange={handleModeChange} />
 
-      <div className="w-100 rounded-lg border-3 border-solid border-neutral-700 mb-10">
-        <DisplayOutput displayValue={displayValue} displayFullOperation={displayFullOperation} />
-        <Numpad onClickKey={onClickKey} />
-      </div>
+      {activeMode === "basic" ? (
+        <div className="w-100 rounded-lg border-3 border-solid border-neutral-700 mb-10">
+          <DisplayOutputBasic displayValue={displayValue} displayFullOperation={displayFullOperation} />
+          <NumpadBasic onClickKey={onClickKey} />
+        </div>
+      ) : (
+        <div className="w-150 rounded-lg border-3 border-solid border-neutral-700 mb-10">
+          <DisplayOutputAdvance displayValue={displayValue} displayFullOperation={displayFullOperation} />
+          <NumpadAdvance onClickKey={onClickKey} />
+        </div>
+      )}
     </div>
   );
 }

@@ -1,12 +1,11 @@
 import React from "react";
-import { Button } from "../ui/button";
-import DisplayOutput from "../DisplayOutput/DisplayOutput";
+import { Button } from "../../../ui/button";
 
 interface Props {
   onClickKey: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-const Numpad = ({ onClickKey }: Props) => {
+const NumpadBasic = ({ onClickKey }: Props) => {
   const keys = [
     ["7", "8", "9", "+", "AC"],
     ["4", "5", "6", "-", "DEL"],
@@ -49,4 +48,4 @@ const Numpad = ({ onClickKey }: Props) => {
   );
 };
 
-export default Numpad;
+export default NumpadBasic;
