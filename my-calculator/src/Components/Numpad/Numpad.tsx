@@ -23,9 +23,7 @@ const Numpad = ({ onClickKey }: Props) => {
   };
 
   const getTextClass = (key: string) => {
-    if (
-      !["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "="].includes(key)
-    ) {
+    if (!["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "="].includes(key)) {
       return "text-neutral-600 group-hover:text-white transition-colors";
     } else if (key === "=") {
       return "text-black text-lg";
@@ -38,17 +36,9 @@ const Numpad = ({ onClickKey }: Props) => {
     <>
       <div className="bg-neutral-800 w-full rounded-b-lg p-4">
         {keys.map((row, rowIndex) => (
-          <div
-            key={`row-${rowIndex}`}
-            className="grid grid-cols-5 gap-2 mb-2 bg-"
-          >
+          <div key={`row-${rowIndex}`} className="grid grid-cols-5 gap-2 mb-2 bg-">
             {row.map((key) => (
-              <Button
-                key={key}
-                value={key}
-                onClick={onClickKey}
-                className={`${getButtonClass(key)} py-4`}
-              >
+              <Button key={key} value={key} onClick={onClickKey} className={`${getButtonClass(key)} py-4`}>
                 <span className={getTextClass(key)}>{key}</span>
               </Button>
             ))}
