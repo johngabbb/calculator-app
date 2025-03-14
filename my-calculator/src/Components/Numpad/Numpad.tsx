@@ -16,9 +16,9 @@ const Numpad = ({ onClickKey }: Props) => {
 
   const getButtonClass = (key: string) => {
     if (key === "=") {
-      return "bg-cyan-600 hover:bg-cyan-500 border-0 shadow-none";
+      return "bg-cyan-600 hover:bg-cyan-500 transition-colors border-0 shadow-none";
     } else {
-      return "bg-neutral-800 hover:bg-cyan-900 shadow-none group";
+      return "bg-neutral-800 hover:bg-cyan-900 transition-colors shadow-none group";
     }
   };
 

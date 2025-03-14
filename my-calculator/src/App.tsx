@@ -79,18 +79,23 @@ function App() {
       switch (operator) {
         case "+":
           result = result + secondOperand;
+          setPrevOperator(operator);
           break;
         case "-":
           result = result - secondOperand;
+          setPrevOperator(operator);
           break;
         case "x":
           result = result * secondOperand;
+          setPrevOperator(operator);
           break;
         case "/":
           result = result / secondOperand;
+          setPrevOperator(operator);
           break;
         case "mod":
           result = result % secondOperand;
+          setPrevOperator(operator);
           break;
         case "=":
           if (equalOperation) {
@@ -116,8 +121,11 @@ function App() {
       }
 
       if (key === "=") {
-        setOperator(operator);
-        setPrevOperator(operator);
+        setOperator(key);
+        if (prevOperator === null) {
+
+        } 
+        
         if (!equalOperation) {
           setFirstOperand(parseFloat(displayValue));
           setDisplayFullOperation(
@@ -140,6 +148,7 @@ function App() {
         setDisplayFullOperation(` ${result} ${key}`);
       }
     } else {
+      setPrevOperator(null);
       setOperator(key);
       setFirstOperand(parseFloat(displayValue));
       setWaitingForSecondOperand(true);
