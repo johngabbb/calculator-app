@@ -58,10 +58,9 @@ const CalculatorAdvance = (props: Props) => {
       const trimmedOperation = displayFullOperation.slice(0, -1).replace(/\s+$/, "");
 
       setDisplayFullOperation(trimmedOperation);
-      console.log(trimmedOperation);
 
       const result = calculateFinalResult(trimmedOperation);
-      setDisplayValue(result);
+      setDisplayValue(!operations.some((op) => trimmedOperation.includes(op)) ? "" : result);
     } catch (error) {
       console.log("error deleting character", error);
     }

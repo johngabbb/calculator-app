@@ -46,7 +46,10 @@ const ModeButtons = ({ activeMode, handleModeChange, handleHistoryTab }: Props) 
 
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button className="bg-neutral-700 text-white hover:bg-emerald-950 transition-colors" onClick={handleHistoryTab}>
+            <Button
+              className="bg-neutral-700 text-white hover:bg-emerald-950 transition-colors"
+              onClick={handleHistoryTab}
+            >
               History
             </Button>
           </AlertDialogTrigger>
@@ -61,7 +64,9 @@ const ModeButtons = ({ activeMode, handleModeChange, handleHistoryTab }: Props) 
 
             <AlertDialogFooter className="flex">
               <div className="mx-auto">
-                <AlertDialogAction className="bg-emerald-800 text-white">Continue</AlertDialogAction>
+                <AlertDialogAction className="bg-emerald-800 hover:bg-emerald-950 transition-colors text-white">
+                  Continue
+                </AlertDialogAction>
               </div>
             </AlertDialogFooter>
           </AlertDialogContent>
