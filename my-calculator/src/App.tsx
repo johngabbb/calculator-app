@@ -1,172 +1,16 @@
 import { useState } from "react";
 import "./App.css";
 import ModeButtons from "./Components/ModeButtons/ModeButtons";
-import DisplayOutputBasic from "./Components/CalculatorModes/Basic/DisplayOutput/DisplayOutputBasic";
-import NumpadBasic from "./Components/CalculatorModes/Basic/Numpad/NumpadBasic";
-import DisplayOutputAdvance from "./Components/CalculatorModes/Advance/DisplayOutput/DisplayOutputAdvance";
-import NumpadAdvance from "./Components/CalculatorModes/Advance/Numpad/NumpadAdvance";
+import CalculatorAdvance from "./Components/Calculator/Advance/CalculatorAdvance";
+import CalculatorBasic from "./Components/Calculator/Basic/CalculatorBasic";
+import HistoryTab from "./Components/HistoryTab/HistoryTab";
 
 function App() {
   const [activeMode, setActiveMode] = useState<"basic" | "advance">("basic");
-  const [displayValue, setDisplayValue] = useState<string>("0");
-  const [displayFullOperation, setDisplayFullOperation] = useState<string>("");
-  const [firstOperand, setFirstOperand] = useState<number | null>(null);
-  const [equalOperation, setEqualOperation] = useState<boolean>(false);
-  const [operator, setOperator] = useState<string | null>(null);
-  const [prevOperator, setPrevOperator] = useState<string | null>(null);
-  const [secondOperand, setSecondOperand] = useState<number>(0);
-  const [waitingForSecondOperand, setWaitingForSecondOperand] = useState<boolean>(false);
+  const [historyClick, setHistoryClick] = useState<boolean>(false);
 
-  const operations = ["+", "-", "x", "/", "mod", "="];
-
-  const onClickKey = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const value = e.currentTarget.value;
-
-    if (/[0-9.]/.test(value)) {
-      handleNumberInput(value);
-    }
-
-    if (value === "AC") {
-      handleAllClear(value);
-    }
-
-    if (value === "DEL") {
-      handleDeleteChar(value);
-    }
-
-    if (value === "±") {
-      handleNegateOperation();
-    }
-
-    if (operations.includes(value)) {
-      handleOperation(value);
-    }
-  };
-
-  const handleAllClear = (key: string) => {
-    if (key === "AC") {
-      setDisplayValue("0");
-      setDisplayFullOperation("");
-      setOperator(null);
-      setFirstOperand(null);
-      setSecondOperand(0);
-      setPrevOperator(null);
-      setWaitingForSecondOperand(false);
-    }
-  };
-
-  const handleDeleteChar = (key: string) => {
-    if (displayValue === "0") return;
-
-    if (key === "DEL") {
-      if (displayFullOperation.includes("=")) {
-        setDisplayFullOperation("");
-      } else {
-        setDisplayValue(displayValue.length === 1 ? "0" : displayValue.slice(0, -1));
-      }
-    }
-  };
-
-  const handleNumberInput = (digit: string) => {
-    if (waitingForSecondOperand || equalOperation) {
-      setDisplayValue(digit);
-      setEqualOperation(false);
-      setDisplayFullOperation(equalOperation ? "" : displayFullOperation);
-    } else {
-      if (displayValue === "0" && digit !== ".") {
-        setDisplayValue(digit);
-      } else if (digit === "." && displayValue.includes(".")) {
-        setDisplayValue(displayValue);
-      } else {
-        setDisplayValue(displayValue.concat(digit));
-      }
-      setDisplayFullOperation(displayFullOperation === "" ? "" : displayFullOperation);
-    }
-    setWaitingForSecondOperand(false);
-  };
-
-  const handleOperation = (key: string) => {
-    // Handling operations
-    if (key !== "=") {
-      if (operator !== null && firstOperand !== null && !waitingForSecondOperand) {
-        const secondOperand = parseFloat(displayValue);
-        let result = calculateResult(firstOperand, secondOperand, operator);
-
-        setDisplayValue(result.toString());
-
-        setFirstOperand(result);
-
-        setDisplayFullOperation(`${result} ${key}`);
-      } else {
-        setFirstOperand(parseFloat(displayValue));
-        setDisplayFullOperation(parseFloat(displayValue).toString().concat(` ${key}`));
-      }
-
-      setOperator(key);
-      setPrevOperator(null);
-      setWaitingForSecondOperand(true);
-      setEqualOperation(false);
-    }
-    // Handling equals sign
-    else {
-      const currentValue = parseFloat(displayValue);
-
-      // If this is the first equals after an operation
-      if (!equalOperation) {
-        // Store the second operand for repeat operations
-        const secondOperand = currentValue;
-        setSecondOperand(secondOperand);
-
-        // If we have a first operand and an operator, calculate the result
-        if (firstOperand !== null && operator !== null) {
-          const result = calculateResult(firstOperand, secondOperand, operator);
-
-          setDisplayValue(result.toString());
-
-          setDisplayFullOperation(`${firstOperand} ${operator} ${secondOperand} =`);
-
-          setPrevOperator(operator);
-
-          setEqualOperation(true);
-        }
-      }
-      // If equals is pressed again after a previous equals
-      else if (equalOperation && prevOperator !== null) {
-        // Use the stored second operand and previous operator
-        const result = calculateResult(parseFloat(displayValue), secondOperand, prevOperator);
-
-        setDisplayValue(result.toString());
-        setDisplayFullOperation(`${currentValue} ${prevOperator} ${secondOperand} =`);
-      }
-
-      // After equals, we're not waiting for a second operand anymore
-      setWaitingForSecondOperand(false);
-      setOperator("=");
-    }
-  };
-
-  const calculateResult = (firstOperand: number, secondOperand: number, operation: string): number => {
-    switch (operation) {
-      case "+":
-        return firstOperand + secondOperand;
-      case "-":
-        return firstOperand - secondOperand;
-      case "x":
-        return firstOperand * secondOperand;
-      case "/":
-        return firstOperand / secondOperand;
-      case "mod":
-        return firstOperand % secondOperand;
-      default:
-        return secondOperand;
-    }
-  };
-
-  // Should negate display output value
-  const handleNegateOperation = () => {
-    const currentValue = parseFloat(displayValue);
-    const negateValue = -1 * currentValue;
-    setDisplayValue(negateValue.toString());
+  const handleHistoryTab = () => {
+    setHistoryClick(true);
   };
 
   const handleModeChange = (mode: "basic" | "advance") => {
@@ -174,20 +18,37 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center overflow-auto min-h-screen w-full bg-neutral-900 bg-image  bg-[size:15px_15px] [background-image:linear-gradient(to_right,rgba(100,100,100,0.2)_1px,transparent_1px),linear-gradient(to_bottom,rgba(100,100,100,0.2)_1px,transparent_1px)]">
-      <ModeButtons activeMode={activeMode} handleModeChange={handleModeChange} />
+    <div
+      className="grid grid-cols-3 content-center overflow-auto min-h-screen w-full bg-neutral-900 bg-image  
+      bg-[size:15px_15px] [background-image:linear-gradient(to_right,rgba(100,100,100,0.2)_1px,transparent_1px),linear-gradient(to_bottom,rgba(100,100,100,0.2)_1px,transparent_1px)]"
+    >
+      <div>
+        <HistoryTab historyClick={historyClick} />
+      </div>
 
-      {activeMode === "basic" ? (
-        <div className="w-100 rounded-lg border-3 border-solid border-neutral-700 mb-10">
-          <DisplayOutputBasic displayValue={displayValue} displayFullOperation={displayFullOperation} />
-          <NumpadBasic onClickKey={onClickKey} />
+      <div className="flex flex-col items-center justify-center">
+        <div
+          className={`transition-all duration-300 ease-in-out ${
+            activeMode === "basic" ? "opacity-100 scale-100" : "opacity-0 scale-50 absolute pointer-events-none"
+          }`}
+        >
+          <CalculatorBasic />
         </div>
-      ) : (
-        <div className="w-150 rounded-lg border-3 border-solid border-neutral-700 mb-10">
-          <DisplayOutputAdvance displayValue={displayValue} displayFullOperation={displayFullOperation} />
-          <NumpadAdvance onClickKey={onClickKey} />
+
+        <div
+          className={`transition-all duration-300 ease-in-out ${
+            activeMode === "basic" ? "opacity-0 scale-50 absolute pointer-events-none" : "opacity-100 scale-100"
+          }`}
+        >
+          <CalculatorAdvance />
         </div>
-      )}
+
+        <div className="text-white absolute bottom-40">DEV MY GabMaxHunter</div>
+      </div>
+
+      <div className="flex items-center justify-start ml-20">
+        <ModeButtons activeMode={activeMode} handleModeChange={handleModeChange} handleHistoryTab={handleHistoryTab} />
+      </div>
     </div>
   );
 }
