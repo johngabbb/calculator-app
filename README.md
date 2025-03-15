@@ -1,2 +1,3 @@
 # calculator-app
-Calculator application
+
+Calculator application that provides standard and advance functionalities. Also provides history service. 
