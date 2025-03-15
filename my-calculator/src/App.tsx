@@ -1,166 +1,62 @@
 import { useState } from "react";
 import "./App.css";
-import Numpad from "./Components/Numpad/Numpad";
-import DisplayOutput from "./Components/DisplayOutput/DisplayOutput";
-
-interface Props {}
+import ModeButtons from "./Components/ModeButtons/ModeButtons";
+import CalculatorAdvance from "./Components/Calculator/Advance/CalculatorAdvance";
+import CalculatorBasic from "./Components/Calculator/Basic/CalculatorBasic";
+import HistoryTab from "./Components/HistoryTab/HistoryTab";
 
 function App() {
-  const [displayValue, setDisplayValue] = useState<string>("0");
-  const [displayFullOperation, setDisplayFullOperation] = useState<string>("");
-  const [firstOperand, setFirstOperand] = useState<number | null>(null);
-  const [operator, setOperator] = useState<string | null>(null);
-  const [waitingForSecondOperand, setWaitingForSecondOperand] =
-    useState<boolean>(false);
+  const [activeMode, setActiveMode] = useState<"standard" | "advance">("standard");
+  const [historyClick, setHistoryClick] = useState<boolean>(false);
 
-  const operations = ["+", "-", "x", "/", "%"];
-
-  const onCLickKey = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const value = e.currentTarget.value;
-
-    if (/[0-9.]/.test(value)) {
-      handleNumberInput(value);
-    }
-
-    if (value === "AC") {
-      handleAllClear(value);
-    }
-
-    if (value === "±") {
-      handleNegateOperation();
-    }
-
-    if (operations.includes(value)) {
-      handleOperation(value);
-    }
+  const handleHistoryTab = () => {
+    setHistoryClick(true);
   };
 
-  const handleAllClear = (key: string) => {
-    if (key === "AC") {
-      setDisplayValue("0");
-      setDisplayFullOperation("");
-      setOperator("");
-      setFirstOperand(null);
-      setWaitingForSecondOperand(false);
-    }
-  };
-
-  const handleNumberInput = (digit: string) => {
-    if (waitingForSecondOperand) {
-      setDisplayValue(digit);
-      setWaitingForSecondOperand(false);
-    } else {
-      setDisplayValue(
-        displayValue === "0"
-          ? digit
-          : displayValue.includes(".") && digit === "."
-          ? displayValue
-          : displayValue.concat(digit)
-      );
-    }
-    setDisplayFullOperation(
-      displayFullOperation === ""
-        ? digit
-        : displayFullOperation.includes(".") && digit === "."
-        ? displayFullOperation
-        : displayFullOperation.concat(digit)
-    );
-  };
-
-  const handleOperation = (key: string) => {
-    if (displayValue === "0" && displayFullOperation === "") return;
-
-    if (operator !== null && firstOperand !== null) {
-      let result = 0;
-
-      switch (key) {
-        case "+":
-        case "-":
-          switch (operator) {
-            case "+":
-              result = firstOperand + parseFloat(displayValue);
-              setFirstOperand(result);
-              setOperator(key);
-              setWaitingForSecondOperand(true);
-              setDisplayValue(result.toString());
-              break;
-            case "-":
-              result = firstOperand - parseFloat(displayValue);
-              setFirstOperand(result);
-              setOperator(key);
-              setWaitingForSecondOperand(true);
-              setDisplayValue(result.toString());
-              break;
-          }
-          break;
-
-        case "*":
-        case "/":
-          switch (operator) {
-            case "*":
-              result = firstOperand * parseFloat(displayValue);
-              setFirstOperand(result);
-              setOperator(key);
-              setWaitingForSecondOperand(true);
-              setDisplayValue(result.toString());
-              break;
-            case "/":
-              result = firstOperand / parseFloat(displayValue);
-              setFirstOperand(result);
-              setOperator(key);
-              setWaitingForSecondOperand(true);
-              setDisplayValue(result.toString());
-              break;
-            default:
-              setFirstOperand(parseFloat(displayValue));
-              setOperator(key);
-              setDisplayValue(displayValue);
-          }
-          break;
-        default:
-          result = 0;
-      }
-    }
-
-    if (!(operator !== null && firstOperand !== null)) {
-      setDisplayValue(displayValue);
-      setOperator(key);
-      setWaitingForSecondOperand(true);
-      setFirstOperand(parseFloat(displayValue));
-    }
-
-    if (operations.includes(displayFullOperation.slice(-1))) {
-      setDisplayFullOperation(displayFullOperation.slice(0, -1) + key);
-    } else {
-      setDisplayFullOperation(displayFullOperation + key);
-    }
-  };
-
-  // Should negate second operand value
-  const handleNegateOperation = () => {
-    if (
-      operations.includes(displayValue) &&
-      operations.includes(displayFullOperation)
-    )
-      return;
-
-    const numericValue = parseFloat(displayValue);
-    const displayFullOperationValue = parseFloat(displayFullOperation);
-    const negateValue = numericValue * -1;
-    const negateDisplay = displayFullOperationValue * -1;
-    setDisplayValue(negateValue.toString());
-    setDisplayFullOperation(negateDisplay.toString());
+  const handleModeChange = (mode: "standard" | "advance") => {
+    setActiveMode(mode);
   };
 
   return (
-    <div className="bg-black h-screen w-screen flex items-center justify-center">
-      <main className="w-100 flex-none">
-        <DisplayOutput
-          displayValue={displayValue}
-          displayFullOperation={displayFullOperation}
+    <div
+      className="grid grid-cols-3 content-center overflow-auto min-h-screen w-full bg-neutral-900 bg-image  
+      bg-[size:15px_15px] [background-image:linear-gradient(to_right,rgba(100,100,100,0.2)_1px,transparent_1px),linear-gradient(to_bottom,rgba(100,100,100,0.2)_1px,transparent_1px)]"
+    >
+      <div>
+        <HistoryTab historyClick={historyClick} />
+      </div>
+
+      <div className="flex flex-col items-center justify-center">
+        <div
+          className={`transition-all delay-100 duration-300 ease-in-out ${
+            activeMode === "standard"
+              ? "opacity-100 scale-100"
+              : "opacity-0 scale-50 absolute pointer-events-none"
+          }`}
+        >
+          <CalculatorBasic />
+        </div>
+
+        <div
+          className={`transition-all delay-100 duration-300 ease-in-out ${
+            activeMode === "standard"
+              ? "opacity-0 scale-50 absolute pointer-events-none"
+              : "opacity-100 scale-100"
+          }`}
+        >
+          <CalculatorAdvance />
+        </div>
+
+        <div className="text-white absolute bottom-40">DEV MY GabMaxHunter</div>
+      </div>
+
+      <div className="flex items-center justify-start ml-20">
+        <ModeButtons
+          activeMode={activeMode}
+          handleModeChange={handleModeChange}
+          handleHistoryTab={handleHistoryTab}
         />
-        <Numpad onClickKey={onCLickKey} />
-      </main>
+      </div>
     </div>
   );
 }
