@@ -9,8 +9,9 @@ const CalculatorAdvance = (props: Props) => {
   const [displayFullOperation, setDisplayFullOperation] = useState<string>("");
   const [equalOperation, setEqualOperation] = useState<boolean>(false);
   const [prevInputOperator, setPrevInputOperator] = useState<boolean>(false);
+  const [currentOperand, setCurrentOperand] = useState<string>("");
 
-  const operations = ["+", "-", "x", "/", "mod"];
+  const operations = ["+", "-", "x", "/", "*"];
 
   const onClickKey = (e: React.MouseEvent<HTMLButtonElement>) => {
     const value = e.currentTarget.value;
@@ -24,7 +25,7 @@ const CalculatorAdvance = (props: Props) => {
     }
 
     if (value === "DEL") {
-      handleDeleteChar(value);
+      handleDeleteChar();
     }
 
     if (value === "±") {
@@ -43,82 +44,182 @@ const CalculatorAdvance = (props: Props) => {
   const handleAllClear = (key: string) => {
     if (key === "AC") {
       setDisplayValue("");
+      setCurrentOperand("");
       setDisplayFullOperation("");
       setEqualOperation(false);
       setPrevInputOperator(false);
     }
   };
 
-  const handleDeleteChar = (key: string) => {
+  const handleDeleteChar = () => {
     if (displayFullOperation === "") return;
 
-    setDisplayFullOperation(displayFullOperation.slice(0, -1));
-    console.log(displayFullOperation.slice(0, -1));
-    const result = calculateFinalResult(displayFullOperation.slice(0, -1));
-    setDisplayValue(result);
+    try {
+      const trimmedOperation = displayFullOperation.slice(0, -1).replace(/\s+$/, "");
+
+      setDisplayFullOperation(trimmedOperation);
+      console.log(trimmedOperation);
+
+      const result = calculateFinalResult(trimmedOperation);
+      setDisplayValue(result);
+    } catch (error) {
+      console.log("error deleting character", error);
+    }
   };
 
   const handleNumberInput = (digit: string) => {
-    if (equalOperation) {
-      setDisplayFullOperation(digit);
-      setDisplayValue("");
-      setEqualOperation(false);
-    } else {
-      setDisplayFullOperation(
-        prevInputOperator ? `${displayFullOperation} ${digit}` : displayFullOperation.concat(digit)
-      );
-
-      if (operations.some((op) => displayFullOperation.includes(op))) {
-        let fullOperation = displayFullOperation.concat(digit);
-
-        const result = calculateFinalResult(fullOperation);
-        setDisplayValue(result);
-      }
+    if (digit === "." && currentOperand.includes(".")) {
+      return;
     }
 
-    setPrevInputOperator(false);
+    try {
+      setCurrentOperand(currentOperand.concat(digit));
+
+      if (equalOperation) {
+        if (digit === "." && (currentOperand === "" || currentOperand === ".")) {
+          setDisplayFullOperation(`0${digit}`);
+        } else {
+          setDisplayFullOperation(digit);
+        }
+        setDisplayValue("");
+        setEqualOperation(false);
+      } else {
+        if (prevInputOperator) {
+          if (digit === "." && (currentOperand === "" || currentOperand === ".")) {
+            setDisplayFullOperation(`${displayFullOperation} 0${digit}`);
+          } else {
+            setDisplayFullOperation(`${displayFullOperation} ${digit}`);
+          }
+        } else {
+          if (digit === "." && (currentOperand === "" || currentOperand === ".")) {
+            setDisplayFullOperation(displayFullOperation.concat("0").concat(digit));
+          } else {
+            setDisplayFullOperation(displayFullOperation.concat(digit));
+          }
+        }
+        console.log(digit);
+        console.log(currentOperand);
+        if (operations.some((op) => displayFullOperation.includes(op))) {
+          let fullOperation = displayFullOperation.concat(digit);
+
+          const result = calculateFinalResult(fullOperation);
+          setDisplayValue(result);
+        }
+      }
+
+      setPrevInputOperator(false);
+    } catch (error) {
+      console.log("error handling number input", error);
+    }
   };
 
   const handleOperationInput = (key: string) => {
-    if (displayFullOperation === "") return;
+    try {
+      if (displayFullOperation === "") return;
 
-    if (equalOperation) {
-      setDisplayFullOperation(`${displayValue} ${key}`);
-      setDisplayValue("");
-    } else {
-      if (prevInputOperator) {
-        setDisplayFullOperation(`${displayFullOperation.slice(0, -1)} ${key}`);
+      if (equalOperation) {
+        setDisplayFullOperation(`${displayValue} ${key}`);
+        setDisplayValue("");
       } else {
-        setDisplayFullOperation(`${displayFullOperation} ${key}`);
+        if (prevInputOperator) {
+          setDisplayFullOperation(`${displayFullOperation.slice(0, -1)} ${key}`);
+        } else {
+          setDisplayFullOperation(`${displayFullOperation} ${key}`);
+        }
       }
+      setCurrentOperand("");
+      setEqualOperation(false);
+      setPrevInputOperator(true);
+    } catch (error) {
+      console.log("error handling operation input", error);
     }
-    setEqualOperation(false);
-    setPrevInputOperator(true);
   };
 
   const calculateResult = () => {
-    if (
-      operations.includes(displayFullOperation.slice(-1)) ||
-      !operations.some((op) => displayFullOperation.includes(op))
-    )
-      return;
-    setDisplayFullOperation(`${displayFullOperation}`);
-    setEqualOperation(true);
+    try {
+      if (
+        operations.includes(displayFullOperation.slice(-1)) ||
+        !operations.some((op) => displayFullOperation.includes(op))
+      )
+        return;
+
+      const result = calculateFinalResult(displayFullOperation);
+      setDisplayValue(result);
+      setEqualOperation(true);
+      setCurrentOperand("");
+    } catch (error) {
+      console.log("error calculating result", error);
+    }
   };
 
   const calculateFinalResult = (fullOperation: string) => {
-    if (fullOperation.includes("x")) {
-      fullOperation = fullOperation.replace(/x/g, "*");
-    }
+    if (!fullOperation || fullOperation.trim() === "") return "0";
 
-    return eval(fullOperation);
+    try {
+      let processedOperation = fullOperation.replace(/x/g, "*");
+
+      // Handle trailing operators or decimal points
+      if (operations.includes(processedOperation.slice(-1))) {
+        processedOperation = processedOperation.slice(0, -1).trim();
+        setPrevInputOperator(true);
+      } else if (processedOperation.slice(-1) === ".") {
+        processedOperation = processedOperation.slice(0, -1).trim();
+
+        // Check if after removing decimal, there's an operator
+        if (operations.includes(processedOperation.slice(-1))) {
+          processedOperation = processedOperation.slice(0, -1).trim();
+        }
+
+        setPrevInputOperator(false);
+      } else {
+        setPrevInputOperator(false);
+      }
+
+      // Calculate the result
+      const result = eval(processedOperation);
+
+      // Check for valid result
+      if (result === undefined || isNaN(result) || !isFinite(result)) {
+        return "Error";
+      }
+
+      return result.toString();
+    } catch (error) {
+      console.error("Calculation error:", error);
+      return "Error";
+    }
   };
 
   // Should negate display output value
   const handleNegateOperation = () => {
-    const currentValue = parseFloat(displayValue);
-    const negateValue = -1 * currentValue;
-    setDisplayValue(negateValue.toString());
+    if (displayFullOperation === "" || operations.includes(displayFullOperation.slice(-1))) return;
+
+    try {
+      let currentValue = parseFloat(currentOperand || "0");
+      let negateValue = -1 * currentValue;
+
+      if (!equalOperation && currentOperand !== "") {
+        // Find the last number in the operation and replace it
+        const lastNumberRegex = /(-?\d*\.?\d+)$/;
+        const updatedOperation = displayFullOperation.replace(
+          lastNumberRegex,
+          negateValue.toString()
+        );
+        const result = calculateFinalResult(updatedOperation);
+        setDisplayValue(result);
+        setDisplayFullOperation(updatedOperation);
+        setCurrentOperand(negateValue.toString());
+      } else {
+        currentValue = parseFloat(displayValue);
+        negateValue = -1 * currentValue;
+        setDisplayFullOperation(negateValue.toString());
+        setCurrentOperand("");
+        setDisplayValue("");
+        setEqualOperation(false);
+      }
+    } catch (error) {
+      console.error("Error negating value:", error);
+    }
   };
   return (
     <>
