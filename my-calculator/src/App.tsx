@@ -6,14 +6,14 @@ import CalculatorBasic from "./Components/Calculator/Basic/CalculatorBasic";
 import HistoryTab from "./Components/HistoryTab/HistoryTab";
 
 function App() {
-  const [activeMode, setActiveMode] = useState<"basic" | "advance">("basic");
+  const [activeMode, setActiveMode] = useState<"standard" | "advance">("standard");
   const [historyClick, setHistoryClick] = useState<boolean>(false);
 
   const handleHistoryTab = () => {
     setHistoryClick(true);
   };
 
-  const handleModeChange = (mode: "basic" | "advance") => {
+  const handleModeChange = (mode: "standard" | "advance") => {
     setActiveMode(mode);
   };
 
@@ -28,16 +28,20 @@ function App() {
 
       <div className="flex flex-col items-center justify-center">
         <div
-          className={`transition-all duration-300 ease-in-out ${
-            activeMode === "basic" ? "opacity-100 scale-100" : "opacity-0 scale-50 absolute pointer-events-none"
+          className={`transition-all delay-100 duration-300 ease-in-out ${
+            activeMode === "standard"
+              ? "opacity-100 scale-100"
+              : "opacity-0 scale-50 absolute pointer-events-none"
           }`}
         >
           <CalculatorBasic />
         </div>
 
         <div
-          className={`transition-all duration-300 ease-in-out ${
-            activeMode === "basic" ? "opacity-0 scale-50 absolute pointer-events-none" : "opacity-100 scale-100"
+          className={`transition-all delay-100 duration-300 ease-in-out ${
+            activeMode === "standard"
+              ? "opacity-0 scale-50 absolute pointer-events-none"
+              : "opacity-100 scale-100"
           }`}
         >
           <CalculatorAdvance />
@@ -47,7 +51,11 @@ function App() {
       </div>
 
       <div className="flex items-center justify-start ml-20">
-        <ModeButtons activeMode={activeMode} handleModeChange={handleModeChange} handleHistoryTab={handleHistoryTab} />
+        <ModeButtons
+          activeMode={activeMode}
+          handleModeChange={handleModeChange}
+          handleHistoryTab={handleHistoryTab}
+        />
       </div>
     </div>
   );

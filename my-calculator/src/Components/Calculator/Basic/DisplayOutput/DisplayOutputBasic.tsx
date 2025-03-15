@@ -11,7 +11,7 @@ const DisplayOutputBasic = ({ displayFullOperation, displayValue }: Props) => {
           <div className="w-full h-full min-h-[2.25rem] text-neutral-500 text-right text-2xl font-mono pr-4">
             <span>{displayFullOperation}</span>
           </div>
-          <div className="w-full text-white text-right text-4xl font-mono pr-4">{displayValue}</div>
+          <div className="w-full min-h-[2.5rem] text-white text-right text-4xl font-mono pr-4">{displayValue}</div>
         </div>
       </div>
     </>

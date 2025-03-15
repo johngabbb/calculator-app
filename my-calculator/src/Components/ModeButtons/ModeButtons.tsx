@@ -13,8 +13,8 @@ import {
 } from "../ui/alert-dialog";
 
 interface Props {
-  activeMode: "basic" | "advance";
-  handleModeChange: (mode: "basic" | "advance") => void;
+  activeMode: "standard" | "advance";
+  handleModeChange: (mode: "standard" | "advance") => void;
   handleHistoryTab: () => void;
 }
 
@@ -24,13 +24,13 @@ const ModeButtons = ({ activeMode, handleModeChange, handleHistoryTab }: Props) 
       <div className="flex flex-col gap-5 mb-5 w-min">
         <Button
           className={`px-4 py-2 rounded min-w-30 ${
-            activeMode === "basic"
+            activeMode === "standard"
               ? "bg-emerald-800 text-white hover:bg-emerald-800"
               : "bg-neutral-700 text-white hover:bg-emerald-950 transition-colors"
           }`}
-          onClick={() => handleModeChange("basic")}
+          onClick={() => handleModeChange("standard")}
         >
-          Basic
+          Standard
         </Button>
 
         <Button

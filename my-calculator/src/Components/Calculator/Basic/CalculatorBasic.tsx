@@ -5,7 +5,7 @@ import NumpadBasic from "./Numpad/NumpadBasic";
 interface Props {}
 
 const CalculatorBasic = (props: Props) => {
-  const [displayValue, setDisplayValue] = useState<string>("0");
+  const [displayValue, setDisplayValue] = useState<string>("");
   const [displayFullOperation, setDisplayFullOperation] = useState<string>("");
   const [firstOperand, setFirstOperand] = useState<number | null>(null);
   const [equalOperation, setEqualOperation] = useState<boolean>(false);
@@ -42,7 +42,7 @@ const CalculatorBasic = (props: Props) => {
 
   const handleAllClear = (key: string) => {
     if (key === "AC") {
-      setDisplayValue("0");
+      setDisplayValue("");
       setDisplayFullOperation("");
       setOperator(null);
       setFirstOperand(null);
@@ -83,6 +83,7 @@ const CalculatorBasic = (props: Props) => {
   };
 
   const handleOperation = (key: string) => {
+    if (displayValue === "") return;
     // Handling operations
     if (key !== "=") {
       if (operator !== null && firstOperand !== null && !waitingForSecondOperand) {

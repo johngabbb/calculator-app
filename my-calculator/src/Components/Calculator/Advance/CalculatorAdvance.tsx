@@ -5,16 +5,12 @@ import NumpadAdvance from "./Numpad/NumpadAdvance";
 interface Props {}
 
 const CalculatorAdvance = (props: Props) => {
-  const [displayValue, setDisplayValue] = useState<string>("0");
+  const [displayValue, setDisplayValue] = useState<string>("");
   const [displayFullOperation, setDisplayFullOperation] = useState<string>("");
-  const [firstOperand, setFirstOperand] = useState<number | null>(null);
   const [equalOperation, setEqualOperation] = useState<boolean>(false);
-  const [operator, setOperator] = useState<string | null>(null);
-  const [prevOperator, setPrevOperator] = useState<string | null>(null);
-  const [secondOperand, setSecondOperand] = useState<number>(0);
-  const [waitingForSecondOperand, setWaitingForSecondOperand] = useState<boolean>(false);
+  const [prevInputOperator, setPrevInputOperator] = useState<boolean>(false);
 
-  const operations = ["+", "-", "x", "/", "mod", "="];
+  const operations = ["+", "-", "x", "/", "mod"];
 
   const onClickKey = (e: React.MouseEvent<HTMLButtonElement>) => {
     const value = e.currentTarget.value;
@@ -36,69 +32,86 @@ const CalculatorAdvance = (props: Props) => {
     }
 
     if (operations.includes(value)) {
-      handleOperation(value);
+      handleOperationInput(value);
+    }
+
+    if (value === "=") {
+      calculateResult();
     }
   };
 
   const handleAllClear = (key: string) => {
     if (key === "AC") {
-      setDisplayValue("0");
+      setDisplayValue("");
       setDisplayFullOperation("");
-      setOperator(null);
-      setFirstOperand(null);
-      setSecondOperand(0);
-      setPrevOperator(null);
-      setWaitingForSecondOperand(false);
+      setEqualOperation(false);
+      setPrevInputOperator(false);
     }
   };
 
   const handleDeleteChar = (key: string) => {
-    if (displayValue === "0") return;
+    if (displayFullOperation === "") return;
 
-    if (key === "DEL") {
-      if (displayFullOperation.includes("=")) {
-        setDisplayFullOperation("");
-      } else {
-        setDisplayValue(displayValue.length === 1 ? "0" : displayValue.slice(0, -1));
-      }
-    }
+    setDisplayFullOperation(displayFullOperation.slice(0, -1));
+    console.log(displayFullOperation.slice(0, -1));
+    const result = calculateFinalResult(displayFullOperation.slice(0, -1));
+    setDisplayValue(result);
   };
 
   const handleNumberInput = (digit: string) => {
-    if (waitingForSecondOperand || equalOperation) {
-      setDisplayValue(digit);
+    if (equalOperation) {
+      setDisplayFullOperation(digit);
+      setDisplayValue("");
       setEqualOperation(false);
-      setDisplayFullOperation(equalOperation ? "" : displayFullOperation);
     } else {
-      if (displayValue === "0" && digit !== ".") {
-        setDisplayValue(digit);
-      } else if (digit === "." && displayValue.includes(".")) {
-        setDisplayValue(displayValue);
-      } else {
-        setDisplayValue(displayValue.concat(digit));
+      setDisplayFullOperation(
+        prevInputOperator ? `${displayFullOperation} ${digit}` : displayFullOperation.concat(digit)
+      );
+
+      if (operations.some((op) => displayFullOperation.includes(op))) {
+        let fullOperation = displayFullOperation.concat(digit);
+
+        const result = calculateFinalResult(fullOperation);
+        setDisplayValue(result);
       }
-      setDisplayFullOperation(displayFullOperation === "" ? "" : displayFullOperation);
     }
-    setWaitingForSecondOperand(false);
+
+    setPrevInputOperator(false);
   };
 
-  const handleOperation = (key: string) => {};
+  const handleOperationInput = (key: string) => {
+    if (displayFullOperation === "") return;
 
-  const calculateResult = (firstOperand: number, secondOperand: number, operation: string): number => {
-    switch (operation) {
-      case "+":
-        return firstOperand + secondOperand;
-      case "-":
-        return firstOperand - secondOperand;
-      case "x":
-        return firstOperand * secondOperand;
-      case "/":
-        return firstOperand / secondOperand;
-      case "mod":
-        return firstOperand % secondOperand;
-      default:
-        return secondOperand;
+    if (equalOperation) {
+      setDisplayFullOperation(`${displayValue} ${key}`);
+      setDisplayValue("");
+    } else {
+      if (prevInputOperator) {
+        setDisplayFullOperation(`${displayFullOperation.slice(0, -1)} ${key}`);
+      } else {
+        setDisplayFullOperation(`${displayFullOperation} ${key}`);
+      }
     }
+    setEqualOperation(false);
+    setPrevInputOperator(true);
+  };
+
+  const calculateResult = () => {
+    if (
+      operations.includes(displayFullOperation.slice(-1)) ||
+      !operations.some((op) => displayFullOperation.includes(op))
+    )
+      return;
+    setDisplayFullOperation(`${displayFullOperation}`);
+    setEqualOperation(true);
+  };
+
+  const calculateFinalResult = (fullOperation: string) => {
+    if (fullOperation.includes("x")) {
+      fullOperation = fullOperation.replace(/x/g, "*");
+    }
+
+    return eval(fullOperation);
   };
 
   // Should negate display output value
@@ -110,7 +123,11 @@ const CalculatorAdvance = (props: Props) => {
   return (
     <>
       <div className="w-150 rounded-lg border-3 border-solid border-neutral-700 mb-10">
-        <DisplayOutputAdvance displayValue={displayValue} displayFullOperation={displayFullOperation} />
+        <DisplayOutputAdvance
+          displayValue={displayValue}
+          displayFullOperation={displayFullOperation}
+          equalOperation={equalOperation}
+        />
         <NumpadAdvance onClickKey={onClickKey} />
       </div>
     </>
