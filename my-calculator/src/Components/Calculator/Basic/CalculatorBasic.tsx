@@ -178,7 +178,7 @@ const CalculatorBasic = ({ addToHistory }: Props) => {
 
   return (
     <>
-      <div className="w-100 rounded-lg border-3 border-solid border-neutral-700 mb-10">
+      <div className="w-100 rounded-lg border-3 border-solid border-neutral-700 mb-10 shadow-lg shadow-black">
         <DisplayOutputBasic
           displayValue={displayValue}
           displayFullOperation={displayFullOperation}

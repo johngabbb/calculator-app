@@ -31,11 +31,11 @@ const NumpadAdvance = ({ onClickKey }: Props) => {
 
   const getTextClass = (key: string) => {
     if (!["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "="].includes(key)) {
-      return "text-neutral-600 group-hover:text-white transition-colors";
+      return "text-neutral-600 group-hover:text-white transition-colors delay-150";
     } else if (key === "=") {
       return "text-black text-lg";
     } else {
-      return "text-neutral-200 group-hover:text-white transition-colors";
+      return "text-neutral-200 group-hover:text-white transition-colors delay-150";
     }
   };
 

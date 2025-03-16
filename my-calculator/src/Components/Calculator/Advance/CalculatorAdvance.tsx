@@ -770,7 +770,7 @@ const CalculatorAdvance = ({ addToHistory }: Props) => {
 
   return (
     <>
-      <div className="w-150 rounded-lg border-3 border-solid border-neutral-700 mb-10">
+      <div className="w-150 rounded-lg border-3 border-solid border-neutral-700 mb-10 shadow-2xl shadow-black">
         <DisplayOutputAdvance
           displayValue={displayValue}
           displayFullOperation={displayFullOperation}

@@ -1,5 +1,6 @@
 import { Button } from "../ui/button";
 import { ScrollArea } from "../ui/scroll-area";
+import { Separator } from "../ui/separator";
 
 interface Props {
   historyClick: boolean;
@@ -14,7 +15,9 @@ const HistoryTab = ({ historyClick, historyArray, setHistoryArray }: Props) => {
 
   return (
     <div className="p-5 flex flex-col h-full">
-      <div className="text-emerald-600 font-bold p-5">History</div>
+      <div className="text-emerald-600 font-bold p-4 mx-auto">History</div>
+
+      <Separator className="bg-neutral-500 max-w-50 mx-auto mb-3" />
 
       <ScrollArea className="flex-1 h-[calc(100vh-200px)]">
         <div className="pr-4">
@@ -44,12 +47,13 @@ const HistoryTab = ({ historyClick, historyArray, setHistoryArray }: Props) => {
         </div>
       </ScrollArea>
 
-      <div className="mt-4">
+      <div className="mt-5 w-50 mx-auto">
+        <Separator className="bg-neutral-500 max-w-50 mx-auto mb-3" />
         {historyArray.length === 0 ? (
           <p className="text-neutral-500 font-bold">No history yet</p>
         ) : (
           <Button
-            className="bg-emerald-800 hover:bg-emerald-950 transition-colors font-bold"
+            className="bg-emerald-800 hover:bg-emerald-950 font-bold transform transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110"
             onClick={handleClearHistory}
           >
             Clear
