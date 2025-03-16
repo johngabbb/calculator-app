@@ -47,7 +47,7 @@ function App() {
           <CalculatorAdvance />
         </div>
 
-        <div className="text-white absolute bottom-40">DEV MY GabMaxHunter</div>
+        <div className="text-white absolute bottom-40">DEV BY GabMaxHunter</div>
       </div>
 
       <div className="flex items-center justify-start ml-20">

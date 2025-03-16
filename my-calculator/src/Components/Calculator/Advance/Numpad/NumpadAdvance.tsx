@@ -47,7 +47,12 @@ const NumpadAdvance = ({ onClickKey }: Props) => {
             {advanceKeys.map((row, rowIndex) => (
               <div key={`row-${rowIndex}`} className="grid grid-cols-3 gap-2 mb-2">
                 {row.map((key) => (
-                  <Button key={key} value={key} className={`${getButtonClass(key)} py-4`}>
+                  <Button
+                    key={key}
+                    value={key}
+                    onClick={onClickKey}
+                    className={`${getButtonClass(key)} py-4`}
+                  >
                     <span className={`${getTextClass(key)} `}>{key}</span>
                   </Button>
                 ))}
@@ -63,7 +68,12 @@ const NumpadAdvance = ({ onClickKey }: Props) => {
             {keys.map((row, rowIndex) => (
               <div key={`row-${rowIndex}`} className="grid grid-cols-5 gap-2 mb-2">
                 {row.map((key) => (
-                  <Button key={key} value={key} onClick={onClickKey} className={`${getButtonClass(key)} py-4`}>
+                  <Button
+                    key={key}
+                    value={key}
+                    onClick={onClickKey}
+                    className={`${getButtonClass(key)} py-4`}
+                  >
                     <span className={getTextClass(key)}>{key}</span>
                   </Button>
                 ))}
