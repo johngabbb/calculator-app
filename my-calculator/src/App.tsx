@@ -8,9 +8,14 @@ import HistoryTab from "./Components/HistoryTab/HistoryTab";
 function App() {
   const [activeMode, setActiveMode] = useState<"standard" | "advance">("standard");
   const [historyClick, setHistoryClick] = useState<boolean>(false);
+  const [historyArray, setHistoryArray] = useState<string[]>([]);
 
   const handleHistoryTab = () => {
     setHistoryClick(true);
+  };
+
+  const addToHistory = (operation: string) => {
+    setHistoryArray([...historyArray, operation]);
   };
 
   const handleModeChange = (mode: "standard" | "advance") => {
@@ -23,7 +28,11 @@ function App() {
       bg-[size:15px_15px] [background-image:linear-gradient(to_right,rgba(100,100,100,0.2)_1px,transparent_1px),linear-gradient(to_bottom,rgba(100,100,100,0.2)_1px,transparent_1px)]"
     >
       <div>
-        <HistoryTab historyClick={historyClick} />
+        <HistoryTab
+          historyClick={historyClick}
+          historyArray={historyArray}
+          setHistoryArray={setHistoryArray}
+        />
       </div>
 
       <div className="flex flex-col items-center justify-center">
@@ -34,7 +43,7 @@ function App() {
               : "opacity-0 scale-50 absolute pointer-events-none"
           }`}
         >
-          <CalculatorBasic />
+          <CalculatorBasic addToHistory={addToHistory} />
         </div>
 
         <div
@@ -44,7 +53,7 @@ function App() {
               : "opacity-100 scale-100"
           }`}
         >
-          <CalculatorAdvance />
+          <CalculatorAdvance addToHistory={addToHistory} />
         </div>
 
         <div className="text-white absolute bottom-40">DEV BY GabMaxHunter</div>

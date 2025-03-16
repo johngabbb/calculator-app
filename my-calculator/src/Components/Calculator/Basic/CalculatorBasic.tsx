@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import DisplayOutputBasic from "./DisplayOutput/DisplayOutputBasic";
 import NumpadBasic from "./Numpad/NumpadBasic";
 
-interface Props {}
+interface Props {
+  addToHistory: (operation: string) => void;
+}
 
-const CalculatorBasic = (props: Props) => {
+const CalculatorBasic = ({ addToHistory }: Props) => {
   const [displayValue, setDisplayValue] = useState<string>("");
   const [displayFullOperation, setDisplayFullOperation] = useState<string>("");
   const [firstOperand, setFirstOperand] = useState<number | null>(null);
@@ -126,6 +128,8 @@ const CalculatorBasic = (props: Props) => {
           setPrevOperator(operator);
 
           setEqualOperation(true);
+
+          addToHistory(`${firstOperand} ${operator} ${secondOperand} = ${result.toString()}`);
         }
       }
       // If equals is pressed again after a previous equals
@@ -135,6 +139,7 @@ const CalculatorBasic = (props: Props) => {
 
         setDisplayValue(result.toString());
         setDisplayFullOperation(`${currentValue} ${prevOperator} ${secondOperand} =`);
+        addToHistory(`${currentValue} ${prevOperator} ${secondOperand} = ${result.toString()}`);
       }
 
       // After equals, we're not waiting for a second operand anymore
@@ -143,7 +148,11 @@ const CalculatorBasic = (props: Props) => {
     }
   };
 
-  const calculateResult = (firstOperand: number, secondOperand: number, operation: string): number => {
+  const calculateResult = (
+    firstOperand: number,
+    secondOperand: number,
+    operation: string
+  ): number => {
     switch (operation) {
       case "+":
         return firstOperand + secondOperand;
@@ -170,7 +179,10 @@ const CalculatorBasic = (props: Props) => {
   return (
     <>
       <div className="w-100 rounded-lg border-3 border-solid border-neutral-700 mb-10">
-        <DisplayOutputBasic displayValue={displayValue} displayFullOperation={displayFullOperation} />
+        <DisplayOutputBasic
+          displayValue={displayValue}
+          displayFullOperation={displayFullOperation}
+        />
         <NumpadBasic onClickKey={onClickKey} />
       </div>
     </>
