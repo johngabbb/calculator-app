@@ -23,11 +23,11 @@ const NumpadBasic = ({ onClickKey }: Props) => {
 
   const getTextClass = (key: string) => {
     if (!["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "="].includes(key)) {
-      return "text-neutral-600 group-hover:text-white transition-colors";
+      return "text-neutral-600 group-hover:text-white transition-colors delay-150";
     } else if (key === "=") {
       return "text-black text-lg";
     } else {
-      return "text-neutral-200 group-hover:text-white transition-colors";
+      return "text-neutral-200 group-hover:text-white transition-colors delay-150";
     }
   };
 
@@ -37,7 +37,12 @@ const NumpadBasic = ({ onClickKey }: Props) => {
         {keys.map((row, rowIndex) => (
           <div key={`row-${rowIndex}`} className="grid grid-cols-5 gap-2 mb-2 bg-">
             {row.map((key) => (
-              <Button key={key} value={key} onClick={onClickKey} className={`${getButtonClass(key)} py-4`}>
+              <Button
+                key={key}
+                value={key}
+                onClick={onClickKey}
+                className={`${getButtonClass(key)} py-4`}
+              >
                 <span className={getTextClass(key)}>{key}</span>
               </Button>
             ))}
