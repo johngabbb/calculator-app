@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import DisplayOutputAdvance from "./DisplayOutput/DisplayOutputAdvance";
 import NumpadAdvance from "./Numpad/NumpadAdvance";
 
-interface Props {}
+interface Props {
+  addToHistory: (operation: string) => void;
+}
 
-const CalculatorAdvance = (props: Props) => {
+const CalculatorAdvance = ({ addToHistory }: Props) => {
   const [displayValue, setDisplayValue] = useState<string>("");
   const [displayFullOperation, setDisplayFullOperation] = useState<string>("");
   const [equalOperation, setEqualOperation] = useState<boolean>(false);
@@ -554,6 +556,7 @@ const CalculatorAdvance = (props: Props) => {
       setDisplayValue(result);
       setEqualOperation(true);
       setCurrentOperand("");
+      addToHistory(`${displayFullOperation} = ${result}`);
     } catch (error) {
       console.error("Error calculating result:", error);
       setDisplayValue("Syntax Error");

@@ -27,7 +27,7 @@ function App() {
       className="grid grid-cols-3 content-center overflow-auto min-h-screen w-full bg-neutral-900 bg-image  
       bg-[size:15px_15px] [background-image:linear-gradient(to_right,rgba(100,100,100,0.2)_1px,transparent_1px),linear-gradient(to_bottom,rgba(100,100,100,0.2)_1px,transparent_1px)]"
     >
-      <div>
+      <div className="bg-neutral-800 h-screen overflow-hidden mr-50">
         <HistoryTab
           historyClick={historyClick}
           historyArray={historyArray}
