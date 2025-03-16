@@ -101,6 +101,9 @@ const CalculatorAdvance = (props: Props) => {
     }
   };
 
+  // Modified handleParentheses function to handle implicit multiplication between parentheses
+  // This should replace the existing handleParentheses function in CalculatorAdvance.tsx
+
   const handleParentheses = (parenthesis: string) => {
     try {
       let newFullOperation: string;
@@ -110,10 +113,21 @@ const CalculatorAdvance = (props: Props) => {
         setDisplayValue("");
         setEqualOperation(false);
         setCurrentOperand("");
-      } else if (parenthesis === "(" && (displayFullOperation === "" || prevInputOperator)) {
-        newFullOperation = displayFullOperation === "" ? "(" : `${displayFullOperation} (`;
+      } else if (parenthesis === "(") {
+        // Handle a scenario where a number is directly followed by an opening parenthesis - add implicit multiplication
+        if (
+          displayFullOperation !== "" &&
+          !prevInputOperator &&
+          !operations.some((op) => displayFullOperation.trim().endsWith(op)) &&
+          !displayFullOperation.trim().endsWith("(")
+        ) {
+          newFullOperation = `${displayFullOperation} x (`;
+        } else {
+          newFullOperation = displayFullOperation === "" ? "(" : `${displayFullOperation} (`;
+        }
         setCurrentOperand("");
       } else {
+        // Closing parenthesis
         newFullOperation = `${displayFullOperation}${parenthesis}`;
         // Update current operand only if it's a closing parenthesis
         if (parenthesis === ")") {
@@ -360,6 +374,9 @@ const CalculatorAdvance = (props: Props) => {
     }
   };
 
+  // Modified handleOperationInput function to prevent using minus as a negative input operation
+  // This should replace the existing handleOperationInput function in CalculatorAdvance.tsx
+
   const handleOperationInput = (key: string) => {
     try {
       // Special handling for unary operators that can be applied directly
@@ -485,17 +502,12 @@ const CalculatorAdvance = (props: Props) => {
         setDisplayValue("");
       }
       // Case 2: Previous input was also an operator
-      else if (prevInputOperator && key !== "-") {
-        // Replace the previous operator, unless it's an open parenthesis
-        if (displayFullOperation.trim().endsWith("(")) {
-          // After open parenthesis, only allow negative sign
-          if (key === "-") {
-            newOperation = `${displayFullOperation} ${key}`;
-          } else {
-            return; // Ignore other operators after open parenthesis
-          }
+      else if (prevInputOperator) {
+        // Only allow minus after opening parenthesis, disallow it after other operators
+        if (displayFullOperation.trim().endsWith("(") && key === "-") {
+          newOperation = `${displayFullOperation} ${key}`;
         } else {
-          // Replace previous operator
+          // Replace previous operator if key is different from previous operator
           const trimmed = displayFullOperation.trim();
           // Find the last non-space character
           let lastNonSpaceIndex = trimmed.length - 1;
@@ -571,6 +583,9 @@ const CalculatorAdvance = (props: Props) => {
       // Replace constants
       processedOperation = processedOperation.replace(/π/g, `(${Math.PI})`);
       processedOperation = processedOperation.replace(/e/g, `(${Math.E})`);
+
+      // Handle adjacent parentheses for implicit multiplication: (a)(b) becomes (a)*(b)
+      processedOperation = processedOperation.replace(/\)(\s*)\(/g, ")$1*(");
 
       // Handle special operations and conversions
 
